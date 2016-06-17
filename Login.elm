@@ -1,12 +1,33 @@
-module Login exposing (loginView)
+module Login exposing (loginView, update)
 
 import Html exposing (..)
-import Html.Events exposing (onClick)
-import Model exposing (Model, Msg(..))
+import Html.Events exposing (on, keyCode)
+import Model exposing (Model, Msg(..), UIState(..), LoginCmds(..))
+import Json.Decode as Json
+import Debug exposing (log)
+
+onStuff : (Int -> msg) -> Attribute msg
+onStuff tagger =
+  on "keyup" (Json.map tagger keyCode)
+
+handleClick : Int -> Model -> (Model, Cmd Msg)
+handleClick val model =
+  if val == 13 then
+    ({ model | uiState = RoomUIState}, Cmd.none)
+  else
+    (model, Cmd.none)
+    
+
+
+update : LoginCmds -> Model -> (Model, Cmd Msg)
+update action model =
+  case action of
+    Click val -> handleClick val model
+    Login -> ({ model | uiState = RoomUIState}, Cmd.none)
 
 loginView : Model -> Html Msg
 loginView model =
   div []
-    [ text "login" 
-    , button [ onClick LoginAction ] [ text "login" ]
+    [ text "username"
+    , input [ onStuff <| \v -> LoginView (Click v)] [text "username"]
     ]
