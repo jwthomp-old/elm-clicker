@@ -1,4 +1,4 @@
-module Login exposing (loginView, update)
+module Login exposing (view, update)
 
 import Html exposing (..)
 import Html.Events exposing (on, keyCode)
@@ -25,8 +25,8 @@ update action model =
     Click val -> handleClick val model
     Login -> ({ model | uiState = RoomUIState}, Cmd.none)
 
-loginView : Model -> Html Msg
-loginView model =
+view : Model -> Html Msg
+view model =
   div []
     [ text "username"
     , input [ onStuff <| \v -> LoginView (Click v)] [text "username"]

@@ -1,4 +1,4 @@
-module Room exposing (roomView, update)
+module Room exposing (view, update)
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
@@ -11,8 +11,8 @@ update action model =
   case action of
     Logout -> ({ model | uiState = LoginUIState}, Cmd.none)
 
-roomView : Model -> Html Msg
-roomView model =
+view : Model -> Html Msg
+view model =
   div []
     [ text "room"
     , button [ onClick (RoomView Logout) ] [ text "logout" ]

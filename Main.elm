@@ -10,8 +10,8 @@ module Main exposing (main)
 import Html exposing (..)
 import Html.App as Html
 import Model exposing (Model, Msg(..), UIState(..))
-import Login exposing (loginView)
-import Room exposing (roomView)
+import Login
+import Room
 
 {-| The main function -}
 main : Program Never
@@ -23,7 +23,6 @@ main =
     , subscriptions = subscriptions
     }
 
- 
 init : (Model, Cmd Msg)
 init =
   (Model.init, Cmd.none)
@@ -31,8 +30,8 @@ init =
 view : Model -> Html Msg
 view model =
   case model.uiState of
-    LoginUIState -> loginView model
-    RoomUIState  -> roomView model
+    LoginUIState -> Login.view model
+    RoomUIState  -> Room.view model
 
 -- UPDATE
 update : Msg -> Model -> (Model, Cmd Msg)
