@@ -1,19 +1,28 @@
-module Room exposing (view, update)
+module Room exposing (Model, Msg, init, update, view, Msg(..))
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
-import Model exposing (Model, Msg(..), UIState(..), RoomCmds(..))
 
+-- MODEL
+type alias Model = Int
 
+init : Model
+init = 0
 
-update : RoomCmds -> Model -> (Model, Cmd Msg)
+-- UPDATE
+type Msg
+  = Logout
+
+update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
-    Logout -> ({ model | uiState = LoginUIState}, Cmd.none)
+    Logout -> (model, Cmd.none)
+
+-- VIEW
 
 view : Model -> Html Msg
 view model =
   div []
     [ text "room"
-    , button [ onClick (RoomView Logout) ] [ text "logout" ]
+    , button [ onClick Logout ] [ text "logout" ]
     ]

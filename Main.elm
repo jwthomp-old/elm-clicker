@@ -8,38 +8,81 @@ module Main exposing (main)
 -}
 
 import Html exposing (..)
-import Html.App as Html
-import Model exposing (Model, Msg(..), UIState(..))
+import Html.App as App
+import Debug
 import Login
 import Room
 
 {-| The main function -}
 main : Program Never
 main =
-  Html.program
+  App.program
     { init          = init
     , view          = view
     , update        = update
     , subscriptions = subscriptions
     }
 
+
+-- MODEL
+type UIState
+  = UIStateLogin
+  | UIStateRoom
+  
+type alias Model =
+  { login: Login.Model
+  , room: Room.Model
+  , uiState: UIState
+  }
+
+
+
 init : (Model, Cmd Msg)
 init =
-  (Model.init, Cmd.none)
+  (
+    { login = Login.init False
+    , room  = Room.init
+    , uiState = UIStateLogin
+    }
+  , Cmd.none
+  )
 
-view : Model -> Html Msg
-view model =
-  case model.uiState of
-    LoginUIState -> Login.view model
-    RoomUIState  -> Room.view model
 
 -- UPDATE
+type Msg
+  = MnLogin Login.Msg
+  | MnRoom  Room.Msg
+
+
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
-    None          -> (model, Cmd.none)
-    LoginView cmd -> Login.update cmd model
-    RoomView  cmd -> Room.update  cmd model
+    MnLogin Login.Authenticated ->
+      ({model | uiState = UIStateRoom}, Cmd.none)
+    MnRoom Room.Logout ->
+      ({model | uiState = UIStateLogin}, Cmd.none)
+    MnLogin cmd -> 
+      let
+        (a, b) = Login.update cmd model.login
+      in 
+        ({model | login = a}, Cmd.map MnLogin b)
+        {-
+    MnRoom cmd -> 
+      let
+        (a, b) = Room.update cmd model.room
+      in 
+        ({model | room = a}, Cmd.map MnRoom b)
+-}
+
+-- VIEW
+view : Model -> Html Msg
+view model =
+  case model.uiState of
+    UIStateLogin -> div [] [ App.map MnLogin (Login.view model.login)]
+    UIStateRoom  -> div [] [ App.map MnRoom  (Room.view  model.room)]
+
+
    
 -- SUBSCRIPTIONS
 subscriptions : Model -> Sub Msg
