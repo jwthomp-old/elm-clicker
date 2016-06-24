@@ -70,7 +70,7 @@ update action model =
         (a, b) = Login.update cmd model.loginModel
       in 
         ({model | loginModel = a}, Cmd.map MnLogin b)
-        {-
+{- Not used as no other commands pass to Room right now
     MnRoom cmd -> 
       let
         (a, b) = Room.update cmd model.room
