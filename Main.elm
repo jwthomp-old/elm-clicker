@@ -9,7 +9,6 @@ module Main exposing (main)
 
 import Html exposing (..)
 import Html.App as App
-import Debug
 import Login
 import Room
 
@@ -30,9 +29,10 @@ type UIState
   | UIStateRoom
   
 type alias Model =
-  { login: Login.Model
-  , room: Room.Model
-  , uiState: UIState
+  { loginModel    : Login.Model
+  , roomModel     : Room.Model
+  , uiState       : UIState
+  , authenticated : Bool
   }
 
 
@@ -40,9 +40,10 @@ type alias Model =
 init : (Model, Cmd Msg)
 init =
   (
-    { login = Login.init False
-    , room  = Room.init
-    , uiState = UIStateLogin
+    { loginModel    = Login.init
+    , roomModel     = Room.init
+    , uiState       = UIStateLogin
+    , authenticated = False
     }
   , Cmd.none
   )
@@ -54,19 +55,20 @@ type Msg
   | MnRoom  Room.Msg
 
 
-
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
-    MnLogin Login.Authenticated ->
-      ({model | uiState = UIStateRoom}, Cmd.none)
-    MnRoom Room.Logout ->
-      ({model | uiState = UIStateLogin}, Cmd.none)
+    MnLogin Login.Authenticated -> 
+      { model 
+        | uiState = UIStateRoom
+        , authenticated = True
+        } ! []
+    MnRoom Room.Logout -> {model | uiState = UIStateLogin} ! []
     MnLogin cmd -> 
       let
-        (a, b) = Login.update cmd model.login
+        (a, b) = Login.update cmd model.loginModel
       in 
-        ({model | login = a}, Cmd.map MnLogin b)
+        ({model | loginModel = a}, Cmd.map MnLogin b)
         {-
     MnRoom cmd -> 
       let
@@ -79,8 +81,8 @@ update action model =
 view : Model -> Html Msg
 view model =
   case model.uiState of
-    UIStateLogin -> div [] [ App.map MnLogin (Login.view model.login)]
-    UIStateRoom  -> div [] [ App.map MnRoom  (Room.view  model.room)]
+    UIStateLogin -> div [] [ App.map MnLogin (Login.view model.loginModel)]
+    UIStateRoom  -> div [] [ App.map MnRoom  (Room.view  model.roomModel)]
 
 
    
