@@ -58,6 +58,7 @@ type Msg
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
+    -- Capture the Authenticated message and handle it here. 
     MnLogin Login.Authenticated -> 
       { model 
         | uiState = UIStateRoom
