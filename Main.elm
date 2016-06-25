@@ -68,14 +68,14 @@ update action model =
         |> setCurrentPage LoginPage) ! []
     MnLogin cmd -> 
       let
-        (a, b) = Login.update cmd model.loginModel
+        (data, command) = Login.update cmd model.loginModel
       in 
-        ({model | loginModel = a}, Cmd.map MnLogin b)
+        ({model | loginModel = data}, Cmd.map MnLogin command)
     MnRoom cmd -> 
       let
-        (a, b) = Room.update cmd model.roomModel
+        (data, command) = Room.update cmd model.roomModel
       in 
-        ({model | roomModel = a}, Cmd.map MnRoom b)
+        ({model | roomModel = data}, Cmd.map MnRoom command)
 
 
 -- VIEW
