@@ -2,7 +2,8 @@ module Room exposing (Model, Msg, init, update, view, Msg(..))
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
-import Helper exposing(message)
+import Html.Attributes exposing (..)
+import Helper exposing (message)
 
 -- MODEL
 type alias Model = Int
@@ -26,6 +27,20 @@ update action model =
 view : Model -> Html Msg
 view model =
   div []
-    [ text "room"
-    , button [ onClick Logout ] [ text "logout" ]
+    [ button [ onClick Logout ] [ text "logout" ]
+    , displayMonster
+    ]
+
+
+-- HELPERS
+
+displayMonster : Html msg
+displayMonster =
+  div []
+    [ div [] 
+      [ text "Monster"
+      ]
+    , div [] 
+      [ img [ src "images/orc.png", height 32, width 32] []
+      ]
     ]
