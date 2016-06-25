@@ -24,14 +24,14 @@ main =
 
 
 -- MODEL
-type UIState
-  = UIStateLogin
-  | UIStateRoom
+type Page
+  = LoginPage
+  | GamePage
   
 type alias Model =
   { loginModel    : Login.Model
   , roomModel     : Room.Model
-  , uiState       : UIState
+  , currentPage  : Page
   , authenticated : Bool
   }
 
@@ -42,7 +42,7 @@ init =
   (
     { loginModel    = Login.init
     , roomModel     = Room.init
-    , uiState       = UIStateLogin
+    , currentPage   = LoginPage
     , authenticated = False
     }
   , Cmd.none
@@ -60,30 +60,30 @@ update action model =
   case action of
     -- Capture the Authenticated message and handle it here. 
     MnLogin Login.Authenticated -> 
-      { model 
-        | uiState = UIStateRoom
-        , authenticated = True
-        } ! []
-    MnRoom Room.Logout -> {model | uiState = UIStateLogin} ! []
+      (model
+        |> setCurrentPage GamePage
+        |> setAuthenticated True) ! []
+    MnRoom Room.Deauthenticated -> 
+      (model 
+        |> setCurrentPage LoginPage) ! []
     MnLogin cmd -> 
       let
         (a, b) = Login.update cmd model.loginModel
       in 
         ({model | loginModel = a}, Cmd.map MnLogin b)
-{- Not used as no other commands pass to Room right now
     MnRoom cmd -> 
       let
-        (a, b) = Room.update cmd model.room
+        (a, b) = Room.update cmd model.roomModel
       in 
-        ({model | room = a}, Cmd.map MnRoom b)
--}
+        ({model | roomModel = a}, Cmd.map MnRoom b)
+
 
 -- VIEW
 view : Model -> Html Msg
 view model =
-  case model.uiState of
-    UIStateLogin -> div [] [ App.map MnLogin (Login.view model.loginModel)]
-    UIStateRoom  -> div [] [ App.map MnRoom  (Room.view  model.roomModel)]
+  case model.currentPage of
+    LoginPage -> div [] [ App.map MnLogin (Login.view model.loginModel)]
+    GamePage  -> div [] [ App.map MnRoom  (Room.view  model.roomModel)]
 
 
    
@@ -91,3 +91,13 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
+
+
+-- HELPERS
+setCurrentPage : Page -> Model -> Model 
+setCurrentPage page model =
+  { model | currentPage = page }
+
+setAuthenticated : Bool -> Model -> Model
+setAuthenticated authenticated model =
+  { model | authenticated = authenticated }

@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Task
+import Helper exposing(message)
 
 
 -- MODEL
@@ -32,10 +33,10 @@ update action model =
   case action of
     LoginSubmit   -> model ! [authenticate model.username model.password]
     Authenticated -> model ! [] -- Handler if not captured by parent
+    FailedAuth -> model ! []
     Username username -> {model | username = username} ! []
     Password password -> {model | password = password} ! []
-    FailedAuth -> model ! []
-
+   
 
 -- VIEW
 view : Model -> Html Msg
@@ -49,9 +50,7 @@ view model =
 
 
 -- HELPERS
-message : Msg -> Cmd Msg
-message msg =
-  Task.perform identity identity <| Task.succeed msg
+
 
 authenticate : String -> String -> Cmd Msg
 authenticate username password =
