@@ -4,7 +4,6 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Task
-import Bootstrap.Html exposing (container_)
 -- import Helper exposing(message)
 
 
@@ -50,7 +49,6 @@ view model =
     , input [ type' "password", placeholder "Password", onInput Password ] []
     , button [ onClick LoginSubmit] [ text "login"]
     , displayAuthMessage model
-    , bootstrap
     ]
 
 
@@ -69,9 +67,3 @@ authTask username password =
 displayAuthMessage : Model -> Html Msg
 displayAuthMessage model =
   div [] []
-
-bootstrap : Html Msg
-bootstrap =
-  container_
-    [ 
-    ]

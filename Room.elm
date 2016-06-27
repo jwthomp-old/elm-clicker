@@ -4,15 +4,18 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import Helper exposing (message)
+import Monster exposing (Monster)
 
 -- MODEL
 type alias Model =
   { clicks : Int
+  , currentMonster : Monster
   }
 
 init : Model
 init = 
   { clicks = 0
+  , currentMonster = Monster.getMonster
   }
 
 -- UPDATE
@@ -41,14 +44,14 @@ view model =
 
 -- HELPERS
 
-displayMonster : model ->  Html Msg
+displayMonster : Model ->  Html Msg
 displayMonster model =
   div []
     [ div [] 
-      [ text "Monster"
+      [ text model.currentMonster.name
       ]
     , div [] 
-      [ img [ src "images/orc.png", height 128, width 128, onClick MonsterClick] []
+      [ img [ src model.currentMonster.image, height 128, width 128, onClick MonsterClick] []
       ]
     ]
 
