@@ -6,21 +6,27 @@ import Html.Attributes exposing (..)
 import Helper exposing (message)
 
 -- MODEL
-type alias Model = Int
+type alias Model =
+  { clicks : Int
+  }
 
 init : Model
-init = 0
+init = 
+  { clicks = 0
+  }
 
 -- UPDATE
 type Msg
   = Logout
   | Deauthenticated
+  | MonsterClick
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
     Logout ->          model ! [message Deauthenticated]
     Deauthenticated -> model ! [] -- Handler if not captured by parent
+    MonsterClick -> {model | clicks = model.clicks + 1} ! []
 
 -- VIEW
 
@@ -28,19 +34,25 @@ view : Model -> Html Msg
 view model =
   div []
     [ button [ onClick Logout ] [ text "logout" ]
-    , displayMonster
+    , displayMonster model
+    , displayClicks model
     ]
 
 
 -- HELPERS
 
-displayMonster : Html msg
-displayMonster =
+displayMonster : model ->  Html Msg
+displayMonster model =
   div []
     [ div [] 
       [ text "Monster"
       ]
     , div [] 
-      [ img [ src "images/orc.png", height 32, width 32] []
+      [ img [ src "images/orc.png", height 128, width 128, onClick MonsterClick] []
       ]
     ]
+
+displayClicks : Model -> Html Msg
+displayClicks model =
+  div []
+    [ text <| "Clicks: " ++ toString model.clicks ]
