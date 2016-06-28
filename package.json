@@ -10,13 +10,15 @@
   },
   "scripts": {
     "start": "webpack-dev-server --hot --inline --content-base src/",
-    "build": "webpack",
+    "build": "rimraf dist && webpack",
     "watch": "webpack --watch"
   },
   "devDependencies": {
+    "elm-hot-loader": "^0.3.3",
     "elm-webpack-loader": "^3.0.3",
     "file-loader": "^0.9.0",
     "html-webpack-plugin": "^2.21.0",
+    "rimraf": "^2.5.2",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1"
   }
