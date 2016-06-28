@@ -66,4 +66,7 @@ monsterAttacked model =
     monster = model.currentMonster
     hp      = monster.hitPoints - 1
   in
-    { model | currentMonster = { monster | hitPoints = hp }}
+    if hp > 0 then
+      { model | currentMonster = { monster | hitPoints = hp }}
+    else
+      { model | currentMonster = Monster.getMonster }
