@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 {-| The main module
 
@@ -13,20 +13,18 @@ import Login
 import Room
 
 {-| The main function -}
-main : Program Never
+main : Program (Maybe Model)
 main =
-  App.program
+  App.programWithFlags
     { init          = init
     , view          = view
-    , update        = update
+    , update        = updateWithStorage
     , subscriptions = subscriptions
     }
 
 
 -- MODEL
-type Page
-  = LoginPage
-  | GamePage
+type alias Page = String
   
 type alias Model =
   { loginModel    : Login.Model
@@ -35,24 +33,30 @@ type alias Model =
   , authenticated : Bool
   }
 
+initialModel : Model
+initialModel =
+  { loginModel    = Login.init
+  , roomModel     = Room.init
+  , currentPage   = "LoginPage"
+  , authenticated = False
+  }
 
-
-init : (Model, Cmd Msg)
-init =
-  (
-    { loginModel    = Login.init
-    , roomModel     = Room.init
-    , currentPage   = LoginPage
-    , authenticated = False
-    }
-  , Cmd.none
-  )
+init : Maybe Model -> (Model, Cmd Msg)
+init model =
+  Maybe.withDefault initialModel model ! []
 
 
 -- UPDATE
 type Msg
   = MnLogin Login.Msg
   | MnRoom  Room.Msg
+
+updateWithStorage : Msg -> Model -> (Model, Cmd Msg)
+updateWithStorage action model =
+  let
+    (newModel, cmds) = update action model
+  in
+    newModel ! [ setStorage newModel, cmds ]
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -61,11 +65,11 @@ update action model =
     -- Capture the Authenticated message and handle it here. 
     MnLogin Login.Authenticated -> 
       (model
-        |> setCurrentPage GamePage
+        |> setCurrentPage "GamePage"
         |> setAuthenticated True) ! []
     MnRoom Room.Deauthenticated -> 
       (model 
-        |> setCurrentPage LoginPage) ! []
+        |> setCurrentPage "LoginPage") ! []
     MnLogin cmd -> 
       let
         (data, command) = Login.update cmd model.loginModel
@@ -82,8 +86,9 @@ update action model =
 view : Model -> Html Msg
 view model =
   case model.currentPage of
-    LoginPage -> div [] [ App.map MnLogin (Login.view model.loginModel)]
-    GamePage  -> div [] [ App.map MnRoom  (Room.view  model.roomModel)]
+    "LoginPage" -> div [] [ App.map MnLogin (Login.view model.loginModel)]
+    "GamePage"  -> div [] [ App.map MnRoom  (Room.view  model.roomModel)]
+    _ -> div [] [ text "You are on an UNKNOWN page" ]
 
 
    
@@ -101,3 +106,5 @@ setCurrentPage page model =
 setAuthenticated : Bool -> Model -> Model
 setAuthenticated authenticated model =
   { model | authenticated = authenticated }
+
+port setStorage : Model -> Cmd msg
