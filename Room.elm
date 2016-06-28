@@ -29,7 +29,7 @@ update action model =
   case action of
     Logout ->          model ! [message Deauthenticated]
     Deauthenticated -> model ! [] -- Handler if not captured by parent
-    MonsterClick -> {model | clicks = model.clicks + 1} ! []
+    MonsterClick -> monsterAttacked model ! []
 
 -- VIEW
 
@@ -37,15 +37,15 @@ view : Model -> Html Msg
 view model =
   div []
     [ button [ onClick Logout ] [ text "logout" ]
-    , displayMonster model
+    , viewMonster model
     , displayClicks model
     ]
 
 
 -- HELPERS
 
-displayMonster : Model ->  Html Msg
-displayMonster model =
+viewMonster : Model ->  Html Msg
+viewMonster model =
   div []
     [ div [] 
       [ text model.currentMonster.name
@@ -58,4 +58,12 @@ displayMonster model =
 displayClicks : Model -> Html Msg
 displayClicks model =
   div []
-    [ text <| "Clicks: " ++ toString model.clicks ]
+    [ text <| "Hitpoints: " ++ toString model.currentMonster.hitPoints]
+
+monsterAttacked : Model -> Model
+monsterAttacked model =
+  let
+    monster = model.currentMonster
+    hp      = monster.hitPoints - 1
+  in
+    { model | currentMonster = { monster | hitPoints = hp }}
