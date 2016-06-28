@@ -4,7 +4,7 @@
     "repository": "https://github.com/jwthomp/elm-clicker.git",
     "license": "MPL-2.0",
     "source-directories": [
-        "."
+        "src"
     ],
     "exposed-modules": [
 			"Model"

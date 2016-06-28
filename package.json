@@ -1,0 +1,23 @@
+{
+  "name": "elm-webpack-starter",
+  "description": "Webpack setup for writing Elm apps",
+  "version": "0.6.2",
+  "license": "MIT",
+  "author": "Peter Morawiec",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moarwick/elm-webpack-starter"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --hot --inline --content-base src/",
+    "build": "webpack",
+    "watch": "webpack --watch"
+  },
+  "devDependencies": {
+    "elm-webpack-loader": "^3.0.3",
+    "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.21.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
+  }
+}
