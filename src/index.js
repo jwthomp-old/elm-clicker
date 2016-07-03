@@ -7,9 +7,11 @@ var Elm = require( './Main' );
 var storedState = localStorage.getItem('elm-clicker-save');
 var initialState = storedState ? JSON.parse(storedState) : null;
 
-var app = Elm.Main.embed( document.getElementById( 'main' ), initialState );
+// Just passing up the JSON string to be interpreted by Elm
+var app = Elm.Main.embed( document.getElementById( 'main' ), storedState );
 
 app.ports.setStorage.subscribe(function(state) {
-    console.log('setting storage');
-    localStorage.setItem('elm-clicker-save', JSON.stringify(state));
+  console.log('setting storage');
+  console.log(state);
+  localStorage.setItem('elm-clicker-save', JSON.stringify(state));
 })

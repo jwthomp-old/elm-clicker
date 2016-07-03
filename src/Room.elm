@@ -58,17 +58,17 @@ viewMonster : Model ->  Html Msg
 viewMonster model =
   div []
     [ div [] 
-      [ text model.currentMonster.name
+      [ text model.currentMonster.monster.name
       ]
     , div [] 
-      [ img [ src model.currentMonster.image, height 128, width 128, onClick MonsterClick] []
+      [ img [ src model.currentMonster.monster.image, height 128, width 128, onClick MonsterClick] []
       ]
     ]
 
 displayClicks : Model -> Html Msg
 displayClicks model =
   div []
-    [ text <| "Hitpoints: " ++ toString model.currentMonster.hitPoints]
+    [ text <| "Hitpoints: " ++ toString model.currentMonster.monster.hitPoints]
 
 
       

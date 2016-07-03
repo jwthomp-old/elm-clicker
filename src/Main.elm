@@ -11,9 +11,11 @@ import Html exposing (..)
 import Html.App as App
 import Login
 import Room
+import Json.Encode as JsonEnc
+import Json.Decode as JsonDec
 
 {-| The main function -}
-main : Program (Maybe Model)
+main : Program (Maybe String)
 main =
   App.programWithFlags
     { init          = init
@@ -41,9 +43,9 @@ initialModel =
   , authenticated = False
   }
 
-init : Maybe Model -> (Model, Cmd Msg)
+init : Maybe String -> (Model, Cmd Msg)
 init model =
-  Maybe.withDefault initialModel model ! []
+  Maybe.withDefault initialModel (deserialize model) ! []
 
 
 -- UPDATE
@@ -56,7 +58,7 @@ updateWithStorage action model =
   let
     (newModel, cmds) = update action model
   in
-    newModel ! [ setStorage newModel, cmds ]
+    newModel ! [ setStorage <| serialize newModel, cmds ]
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -107,4 +109,22 @@ setAuthenticated : Bool -> Model -> Model
 setAuthenticated authenticated model =
   { model | authenticated = authenticated }
 
-port setStorage : Model -> Cmd msg
+serialize : Model -> String
+serialize model =
+  JsonEnc.encode 0 <| serializer model
+
+serializer : Model -> JsonEnc.Value
+serializer model =
+  JsonEnc.object 
+    [ ("login", Login.serializer model.loginModel)
+    , ("authenticated", JsonEnc.bool model.authenticated)
+    ]
+
+
+deserialize : Maybe String -> Maybe Model
+deserialize model =
+  Just initialModel
+
+
+
+port setStorage : String -> Cmd msg

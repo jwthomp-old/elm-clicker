@@ -1,9 +1,10 @@
-module Login exposing (Model, Msg, init, update, view, Msg(..))
+module Login exposing (Model, Msg, init, update, view, serializer, Msg(..))
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Task
+import Json.Encode as JsonEnc
 -- import Helper exposing(message)
 
 
@@ -67,3 +68,10 @@ authTask username password =
 displayAuthMessage : Model -> Html Msg
 displayAuthMessage model =
   div [] []
+
+
+serializer : Model -> JsonEnc.Value
+serializer model =
+  JsonEnc.object
+  [ ("username", JsonEnc.string model.username)
+  ]
