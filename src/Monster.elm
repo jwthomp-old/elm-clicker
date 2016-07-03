@@ -2,68 +2,76 @@ module Monster exposing (update, init, Model, Msg, Msg(..))
 
 import List
 import Helper
+import Random
 
--- import Random
 
 -- MODEL
+type alias Monster =
+  { name      : String
+  , hitPoints : Int
+  , image     : String
+  }
+
 type alias Model =
-    { name      : String
-    , hitPoints : Int
-    , image     : String
-    }
+  { seed : Random.Seed
+  , monster : Monster
+  }
 
 init : Model
 init =
-  getMonster 0   
+  { seed = Random.initialSeed 0
+  , monster = getMonster 0
+  }
 
 {- Need to move this into some kind of data file -}
-orc : Model
+orc : Monster
 orc = 
-    { name      = "Orc"
-    , hitPoints = 20
-    , image     = "images/orc.png"
-    }
+  { name      = "Orc"
+  , hitPoints = 20
+  , image     = "images/orc.png"
+  }
 
-goblin : Model
+goblin : Monster
 goblin =
-    { name = "Goblin"
-    , hitPoints = 10
-    , image = "images/orc.png"
-    }
+  { name = "Goblin"
+  , hitPoints = 10
+  , image = "images/orc.png"
+  }
 
-monsters : List Model
+monsters : List Monster
 monsters =
-    [ orc
-    , goblin
-    ]
-
+  [ orc
+  , goblin
+  ]
 
 
 -- UPDATE
 type Msg
-    = Attacked
-    | NewMonster Int
+  = Attacked
+  | NewMonster Int
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
-    case action of
-      Attacked ->
-        monsterAttacked model
-      NewMonster val ->
-        newMonster val model
+  case action of
+    Attacked ->
+      monsterAttacked model
+    NewMonster val ->
+      newMonster val model
 
 
 -- HELPERS
-getMonster : Int -> Model
+getMonster : Int -> Monster
 getMonster val =
-    Maybe.withDefault orc <| List.head (List.drop val monsters)
+  Maybe.withDefault orc <| List.head (List.drop val monsters)
 
 
 monsterAttacked : Model -> (Model, Cmd Msg)
 monsterAttacked model =
   let
-    hp = model.hitPoints - 1
-    model' = {model | hitPoints = hp}
+    monster = model.monster
+    hp = monster.hitPoints - 1
+    monster' = {monster | hitPoints = hp}
+    model' = {model | monster = monster'}
   in
     if hp > 0 then
       model' ! []
@@ -72,4 +80,6 @@ monsterAttacked model =
 
 newMonster : Int -> Model -> (Model, Cmd Msg)
 newMonster val model =
-  getMonster val ! []
+  { seed    = model.seed
+  , monster = getMonster val
+  } ! []
