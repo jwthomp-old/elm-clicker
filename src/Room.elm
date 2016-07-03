@@ -4,18 +4,18 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import Helper exposing (message)
-import Monster exposing (Monster)
+import Monster
 
 -- MODEL
 type alias Model =
   { clicks : Int
-  , currentMonster : Monster
+  , currentMonster : Monster.Model
   }
 
 init : Model
 init = 
   { clicks = 0
-  , currentMonster = Monster.getMonster
+  , currentMonster = Monster.init
   }
 
 -- UPDATE
@@ -23,13 +23,23 @@ type Msg
   = Logout
   | Deauthenticated
   | MonsterClick
+  | RmMonster Monster.Msg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update action model =
   case action of
     Logout ->          model ! [message Deauthenticated]
     Deauthenticated -> model ! [] -- Handler if not captured by parent
-    MonsterClick -> monsterAttacked model ! []
+    MonsterClick -> 
+      let
+        (data, command) = Monster.update Monster.Attacked model.currentMonster
+      in
+        ({model | currentMonster = data}, Cmd.map RmMonster command)
+    RmMonster cmd ->
+      let
+        (data, command) = Monster.update cmd model.currentMonster
+      in
+        ({model | currentMonster = data}, Cmd.map RmMonster command)
 
 -- VIEW
 
@@ -60,13 +70,5 @@ displayClicks model =
   div []
     [ text <| "Hitpoints: " ++ toString model.currentMonster.hitPoints]
 
-monsterAttacked : Model -> Model
-monsterAttacked model =
-  let
-    monster = model.currentMonster
-    hp      = monster.hitPoints - 1
-  in
-    if hp > 0 then
-      { model | currentMonster = { monster | hitPoints = hp }}
-    else
-      { model | currentMonster = Monster.getMonster }
+
+      
