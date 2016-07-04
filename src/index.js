@@ -13,5 +13,5 @@ var app = Elm.Main.embed( document.getElementById( 'main' ), storedState );
 app.ports.setStorage.subscribe(function(state) {
   console.log('setting storage');
   console.log(state);
-  localStorage.setItem('elm-clicker-save', JSON.stringify(state));
+  localStorage.setItem('elm-clicker-save', state);
 })

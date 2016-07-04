@@ -12,7 +12,9 @@ import Html.App as App
 import Login
 import Room
 import Json.Encode as JsonEnc
-import Json.Decode as JsonDec
+import Json.Decode as JsonDec exposing((:=))
+import Debug
+import Result
 
 {-| The main function -}
 main : Program (Maybe String)
@@ -87,10 +89,13 @@ update action model =
 -- VIEW
 view : Model -> Html Msg
 view model =
-  case model.currentPage of
-    "LoginPage" -> div [] [ App.map MnLogin (Login.view model.loginModel)]
-    "GamePage"  -> div [] [ App.map MnRoom  (Room.view  model.roomModel)]
-    _ -> div [] [ text "You are on an UNKNOWN page" ]
+  if model.authenticated == False then
+    div [] [ App.map MnLogin (Login.view model.loginModel)]
+  else
+    case model.currentPage of
+      "LoginPage" -> div [] [ App.map MnLogin (Login.view model.loginModel)]
+      "GamePage"  -> div [] [ App.map MnRoom  (Room.view  model.roomModel)]
+      _ -> div [] [ text "You are on an UNKNOWN page" ]
 
 
    
@@ -111,19 +116,31 @@ setAuthenticated authenticated model =
 
 serialize : Model -> String
 serialize model =
-  JsonEnc.encode 0 <| serializer model
+  Debug.log "serialize" <| JsonEnc.encode 0 <| serializer model
 
 serializer : Model -> JsonEnc.Value
 serializer model =
   JsonEnc.object 
     [ ("login", Login.serializer model.loginModel)
     , ("authenticated", JsonEnc.bool model.authenticated)
+    , ("currentPage", JsonEnc.string model.currentPage)
     ]
 
 
 deserialize : Maybe String -> Maybe Model
-deserialize model =
-  Just initialModel
+deserialize json =
+  case json of
+    Nothing -> Nothing
+    Just json' ->
+      let
+        _ = Debug.log "json" json'
+        model = initialModel
+        authenticated = Result.withDefault False       <| JsonDec.decodeString ("authenticated" := JsonDec.bool) json'
+        currentPage   = Result.withDefault "LoginPage" <| JsonDec.decodeString ("currentPage" := JsonDec.string) json'
+      in
+        Just { model 
+          | authenticated = Debug.log "authed?" authenticated 
+          , currentPage = currentPage }
 
 
 
