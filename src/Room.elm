@@ -1,9 +1,10 @@
-module Room exposing (Model, Msg, init, update, view, Msg(..))
+module Room exposing (Model, Msg, init, update, view, serializer, Msg(..))
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import Helper exposing (message)
+import Json.Encode as JsonEnc
 import Monster
 
 -- MODEL
@@ -72,3 +73,8 @@ displayClicks model =
 
 
       
+serializer : Model -> JsonEnc.Value
+serializer model =
+  JsonEnc.object
+    [ ("clicks", JsonEnc.int model.clicks)
+    ]

@@ -13,6 +13,7 @@ import Login
 import Room
 import Json.Encode as JsonEnc
 import Json.Decode as JsonDec exposing((:=))
+import Json.Decode.Extra exposing ((|:))
 import Debug
 import Result
 
@@ -121,9 +122,10 @@ serialize model =
 serializer : Model -> JsonEnc.Value
 serializer model =
   JsonEnc.object 
-    [ ("login", Login.serializer model.loginModel)
-    , ("authenticated", JsonEnc.bool model.authenticated)
-    , ("currentPage", JsonEnc.string model.currentPage)
+    [ ("login",         Login.serializer model.loginModel)
+    , ("room",          Room.serializer  model.roomModel)
+    , ("authenticated", JsonEnc.bool     model.authenticated)
+    , ("currentPage",   JsonEnc.string   model.currentPage)
     ]
 
 
@@ -137,10 +139,14 @@ deserialize json =
         model = initialModel
         authenticated = Result.withDefault False       <| JsonDec.decodeString ("authenticated" := JsonDec.bool) json'
         currentPage   = Result.withDefault "LoginPage" <| JsonDec.decodeString ("currentPage" := JsonDec.string) json'
+        _             = Debug.log "login" <| Result.withDefault "BORKED"    <| JsonDec.decodeString ("login" := JsonDec.string) json'
+        --roomModel     = Room.deserializer 
       in
         Just { model 
-          | authenticated = Debug.log "authed?" authenticated 
-          , currentPage = currentPage }
+          | authenticated = authenticated 
+          , currentPage   = currentPage 
+          , roomModel     = Room.init
+          , loginModel    = Login.init }
 
 
 
