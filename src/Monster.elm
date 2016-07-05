@@ -1,7 +1,7 @@
 module Monster exposing (update, init, Model, Msg, Msg(..), serializer, deserializer)
 
 import List
-import Helper
+-- import Helper
 import Random
 import Json.Encode as JsonEnc
 import Json.Decode as JsonDec exposing ((:=), Decoder, andThen)
@@ -90,7 +90,7 @@ monsterAttacked model =
     if hp > 0 then
       model' ! []
     else
-      model' ! [Helper.message <| NewMonster 0]
+      model' ! [Random.generate NewMonster (Random.int 0 (List.length monsters))] -- [Helper.message <| NewMonster 0]
 
 newMonster : Int -> Model -> (Model, Cmd Msg)
 newMonster val model =
