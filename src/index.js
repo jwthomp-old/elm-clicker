@@ -5,7 +5,6 @@ require('./styles/main.scss');
 var Elm = require( './Main' );
 
 var storedState = localStorage.getItem('elm-clicker-save');
-var initialState = storedState ? JSON.parse(storedState) : null;
 
 // Just passing up the JSON string to be interpreted by Elm
 var app = Elm.Main.embed( document.getElementById( 'main' ), storedState );

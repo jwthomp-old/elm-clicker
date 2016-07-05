@@ -1,8 +1,11 @@
-module Monster exposing (update, init, Model, Msg, Msg(..))
+module Monster exposing (update, init, Model, Msg, Msg(..), serializer, deserializer)
 
 import List
 import Helper
 import Random
+import Json.Encode as JsonEnc
+import Json.Decode as JsonDec exposing ((:=), Decoder)
+import Json.Decode.Extra exposing ((|:))
 
 
 -- MODEL
@@ -19,7 +22,7 @@ type alias Model =
 
 init : Model
 init =
-  { seed = Random.initialSeed 0
+  { seed = createInitialSeed
   , monster = getMonster 0
   }
 
@@ -83,3 +86,34 @@ newMonster val model =
   { seed    = model.seed
   , monster = getMonster val
   } ! []
+
+createInitialSeed : Random.Seed
+createInitialSeed =
+  Random.initialSeed 0
+
+
+-- SERIALIZATION
+
+serializer : Model -> JsonEnc.Value
+serializer model =
+  JsonEnc.object
+    [ ("monster", monsterSerializer model.monster)
+    ]
+
+monsterSerializer : Monster -> JsonEnc.Value
+monsterSerializer monster =
+  JsonEnc.object
+    [ ("name", JsonEnc.string monster.name)
+    , ("hitpoints", JsonEnc.int monster.hitPoints)
+    ]
+
+deserializer : Decoder Model
+deserializer =
+  JsonDec.succeed Model
+    |: ("seed" := JsonDec.succeed createInitialSeed)
+    |: ("monster" := monsterDeserializer)
+
+monsterDeserializer : Decoder Monster
+monsterDeserializer =
+  -- Need to modify this to restore the monster
+  JsonDec.succeed <| getMonster 0

@@ -1,10 +1,12 @@
-module Room exposing (Model, Msg, init, update, view, serializer, Msg(..))
+module Room exposing (Model, Msg, init, update, view, serializer, deserializer, Msg(..))
 
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (..)
 import Helper exposing (message)
 import Json.Encode as JsonEnc
+import Json.Decode as JsonDec exposing ((:=), Decoder)
+import Json.Decode.Extra exposing((|:))
 import Monster
 
 -- MODEL
@@ -72,9 +74,16 @@ displayClicks model =
     [ text <| "Hitpoints: " ++ toString model.currentMonster.monster.hitPoints]
 
 
-      
+-- SERIALIZATION
+
 serializer : Model -> JsonEnc.Value
 serializer model =
   JsonEnc.object
     [ ("clicks", JsonEnc.int model.clicks)
     ]
+
+deserializer : Decoder Model
+deserializer =
+  JsonDec.succeed Model
+    |: ("clicks" := JsonDec.int)
+    |: JsonDec.succeed Monster.init

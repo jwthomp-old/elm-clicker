@@ -1,10 +1,12 @@
-module Login exposing (Model, Msg, init, update, view, serializer, Msg(..))
+module Login exposing (Model, Msg, init, update, view, serializer, deserializer, Msg(..))
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Task
 import Json.Encode as JsonEnc
+import Json.Decode as JsonDec exposing ((:=), Decoder)
+import Json.Decode.Extra exposing ((|:))
 -- import Helper exposing(message)
 
 
@@ -75,3 +77,10 @@ serializer model =
   JsonEnc.object
   [ ("username", JsonEnc.string model.username)
   ]
+
+deserializer : Decoder Model
+deserializer =
+  JsonDec.succeed Model
+    |: ("username" := JsonDec.string )
+    |: JsonDec.succeed ""
+    |: JsonDec.succeed False

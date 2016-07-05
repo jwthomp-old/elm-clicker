@@ -12,10 +12,11 @@ import Html.App as App
 import Login
 import Room
 import Json.Encode as JsonEnc
-import Json.Decode as JsonDec exposing((:=))
+import Json.Decode as JsonDec exposing((:=), Decoder)
 import Json.Decode.Extra exposing ((|:))
-import Debug
 import Result
+import Debug
+
 
 {-| The main function -}
 main : Program (Maybe String)
@@ -47,8 +48,8 @@ initialModel =
   }
 
 init : Maybe String -> (Model, Cmd Msg)
-init model =
-  Maybe.withDefault initialModel (deserialize model) ! []
+init data =
+  Maybe.withDefault initialModel (deserialize data) ! []
 
 
 -- UPDATE
@@ -131,12 +132,18 @@ serializer model =
 
 deserialize : Maybe String -> Maybe Model
 deserialize json =
-  JsonDec.decodeString deserializer json
+  case json of
+    Nothing -> Nothing
+    Just json' ->
+      Result.toMaybe <| JsonDec.decodeString deserializer json'
 
 deserializer : Decoder Model
 deserializer =
   JsonDec.succeed Model
-    |: ("authenticated" : JsonDec.bool)
+    |: ("login"         := Login.deserializer)
+    |: ("room"          := Room.deserializer)
+    |: ("currentPage"   := JsonDec.string)
+    |: ("authenticated" := JsonDec.bool)
 
 
 port setStorage : String -> Cmd msg
