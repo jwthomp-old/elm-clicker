@@ -131,23 +131,12 @@ serializer model =
 
 deserialize : Maybe String -> Maybe Model
 deserialize json =
-  case json of
-    Nothing -> Nothing
-    Just json' ->
-      let
-        _ = Debug.log "json" json'
-        model = initialModel
-        authenticated = Result.withDefault False       <| JsonDec.decodeString ("authenticated" := JsonDec.bool) json'
-        currentPage   = Result.withDefault "LoginPage" <| JsonDec.decodeString ("currentPage" := JsonDec.string) json'
-        _             = Debug.log "login" <| Result.withDefault "BORKED"    <| JsonDec.decodeString ("login" := JsonDec.string) json'
-        --roomModel     = Room.deserializer 
-      in
-        Just { model 
-          | authenticated = authenticated 
-          , currentPage   = currentPage 
-          , roomModel     = Room.init
-          , loginModel    = Login.init }
+  JsonDec.decodeString deserializer json
 
+deserializer : Decoder Model
+deserializer =
+  JsonDec.succeed Model
+    |: ("authenticated" : JsonDec.bool)
 
 
 port setStorage : String -> Cmd msg
