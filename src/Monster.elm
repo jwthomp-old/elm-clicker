@@ -43,13 +43,21 @@ goblin : MonsterBase
 goblin =
   { name      = "Goblin"
   , hitPoints = 10
-  , image     = "images/orc.png"
+  , image     = "images/troll-155646_640.png"
+  }
+
+sheep : MonsterBase
+sheep =
+  { name      = "Sheep Warrior"
+  , hitPoints = 8
+  , image     = "images/sheep-158272_640.png"
   }
 
 monsters : List MonsterBase
 monsters =
   [ orc
   , goblin
+  , sheep
   ]
 
 
@@ -133,6 +141,7 @@ monsterDeserializer =
 decodeMonsterBase : String -> Decoder MonsterBase
 decodeMonsterBase name = 
   case name of
-    "Orc"    -> JsonDec.succeed orc
-    "Goblin" -> JsonDec.succeed goblin
-    _        -> JsonDec.succeed goblin
+    "Orc"           -> JsonDec.succeed orc
+    "Goblin"        -> JsonDec.succeed goblin
+    "Sheep Warrior" -> JsonDec.succeed sheep
+    _               -> JsonDec.succeed goblin
