@@ -49,7 +49,7 @@ initialModel =
 
 init : Maybe String -> (Model, Cmd Msg)
 init data =
-  Maybe.withDefault initialModel (deserialize data) ! []
+  Maybe.withDefault initialModel (Debug.log "deserialized" (deserialize <| Debug.log "data" data)) ! []
 
 
 -- UPDATE

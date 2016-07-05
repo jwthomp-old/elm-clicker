@@ -4,44 +4,49 @@ import List
 import Helper
 import Random
 import Json.Encode as JsonEnc
-import Json.Decode as JsonDec exposing ((:=), Decoder)
+import Json.Decode as JsonDec exposing ((:=), Decoder, andThen)
 import Json.Decode.Extra exposing ((|:))
 
 
 -- MODEL
-type alias Monster =
+type alias MonsterInstance =
+  { monsterBase : MonsterBase
+  , hitPoints   : Int
+  }
+
+type alias MonsterBase =
   { name      : String
   , hitPoints : Int
   , image     : String
   }
 
 type alias Model =
-  { seed : Random.Seed
-  , monster : Monster
+  { seed    : Random.Seed
+  , monster : MonsterInstance
   }
 
 init : Model
 init =
-  { seed = createInitialSeed
+  { seed    = createInitialSeed
   , monster = getMonster 0
   }
 
 {- Need to move this into some kind of data file -}
-orc : Monster
+orc : MonsterBase
 orc = 
   { name      = "Orc"
   , hitPoints = 20
   , image     = "images/orc.png"
   }
 
-goblin : Monster
+goblin : MonsterBase
 goblin =
-  { name = "Goblin"
+  { name      = "Goblin"
   , hitPoints = 10
-  , image = "images/orc.png"
+  , image     = "images/orc.png"
   }
 
-monsters : List Monster
+monsters : List MonsterBase
 monsters =
   [ orc
   , goblin
@@ -63,18 +68,24 @@ update action model =
 
 
 -- HELPERS
-getMonster : Int -> Monster
+getMonster : Int -> MonsterInstance
 getMonster val =
-  Maybe.withDefault orc <| List.head (List.drop val monsters)
+  let
+    monsterBase : MonsterBase
+    monsterBase = Maybe.withDefault orc <| List.head (List.drop val monsters)
+  in
+    { monsterBase   = monsterBase
+    , hitPoints     = monsterBase.hitPoints
+    }
 
 
 monsterAttacked : Model -> (Model, Cmd Msg)
 monsterAttacked model =
   let
-    monster = model.monster
-    hp = monster.hitPoints - 1
+    monster  = model.monster
+    hp       = monster.hitPoints - 1
     monster' = {monster | hitPoints = hp}
-    model' = {model | monster = monster'}
+    model'   = {model | monster = monster'}
   in
     if hp > 0 then
       model' ! []
@@ -100,20 +111,28 @@ serializer model =
     [ ("monster", monsterSerializer model.monster)
     ]
 
-monsterSerializer : Monster -> JsonEnc.Value
+monsterSerializer : MonsterInstance -> JsonEnc.Value
 monsterSerializer monster =
   JsonEnc.object
-    [ ("name", JsonEnc.string monster.name)
-    , ("hitpoints", JsonEnc.int monster.hitPoints)
+    [ ("monsterBase",   JsonEnc.string monster.monsterBase.name)
+    , ("hitPoints", JsonEnc.int    monster.hitPoints)
     ]
 
 deserializer : Decoder Model
 deserializer =
   JsonDec.succeed Model
-    |: ("seed" := JsonDec.succeed createInitialSeed)
+    |: JsonDec.succeed createInitialSeed
     |: ("monster" := monsterDeserializer)
 
-monsterDeserializer : Decoder Monster
+monsterDeserializer : Decoder MonsterInstance
 monsterDeserializer =
-  -- Need to modify this to restore the monster
-  JsonDec.succeed <| getMonster 0
+  JsonDec.succeed MonsterInstance
+    |: (("monsterBase" := JsonDec.string) `andThen` decodeMonsterBase)
+    |: ("hitPoints"   := JsonDec.int)
+
+decodeMonsterBase : String -> Decoder MonsterBase
+decodeMonsterBase name = 
+  case name of
+    "Orc"    -> JsonDec.succeed orc
+    "Goblin" -> JsonDec.succeed goblin
+    _        -> JsonDec.succeed goblin

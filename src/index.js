@@ -6,6 +6,8 @@ var Elm = require( './Main' );
 
 var storedState = localStorage.getItem('elm-clicker-save');
 
+console.log(storedState);
+
 // Just passing up the JSON string to be interpreted by Elm
 var app = Elm.Main.embed( document.getElementById( 'main' ), storedState );
 

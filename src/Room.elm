@@ -57,14 +57,14 @@ view model =
 
 -- HELPERS
 
-viewMonster : Model ->  Html Msg
+viewMonster : Model -> Html Msg
 viewMonster model =
   div []
     [ div [] 
-      [ text model.currentMonster.monster.name
+      [ text model.currentMonster.monster.monsterBase.name
       ]
     , div [] 
-      [ img [ src model.currentMonster.monster.image, height 128, width 128, onClick MonsterClick] []
+      [ img [ src model.currentMonster.monster.monsterBase.image, height 128, width 128, onClick MonsterClick] []
       ]
     ]
 
@@ -80,10 +80,11 @@ serializer : Model -> JsonEnc.Value
 serializer model =
   JsonEnc.object
     [ ("clicks", JsonEnc.int model.clicks)
+    , ("currentMonster", Monster.serializer model.currentMonster)
     ]
 
 deserializer : Decoder Model
 deserializer =
   JsonDec.succeed Model
-    |: ("clicks" := JsonDec.int)
-    |: JsonDec.succeed Monster.init
+    |: ("clicks"         := JsonDec.int)
+    |: ("currentMonster" := Monster.deserializer)
