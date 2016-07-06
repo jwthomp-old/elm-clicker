@@ -126,8 +126,8 @@ serializer model =
 monsterSerializer : MonsterInstance -> JsonEnc.Value
 monsterSerializer monster =
   JsonEnc.object
-    [ ("monsterBase",   JsonEnc.string monster.monsterBase.name)
-    , ("hitPoints", JsonEnc.int    monster.hitPoints)
+    [ ("monsterBase", JsonEnc.string monster.monsterBase.name)
+    , ("hitPoints",   JsonEnc.int    monster.hitPoints)
     ]
 
 deserializer : Decoder Model
@@ -140,7 +140,7 @@ monsterDeserializer : Decoder MonsterInstance
 monsterDeserializer =
   JsonDec.succeed MonsterInstance
     |: (("monsterBase" := JsonDec.string) `andThen` decodeMonsterBase)
-    |: ("hitPoints"   := JsonDec.int)
+    |: ("hitPoints"    := JsonDec.int)
 
 decodeMonsterBase : String -> Decoder MonsterBase
 decodeMonsterBase name = 

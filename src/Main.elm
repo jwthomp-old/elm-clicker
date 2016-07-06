@@ -11,6 +11,7 @@ import Html exposing (..)
 import Html.App as App
 import Login
 import Room
+import Player
 import Json.Encode as JsonEnc
 import Json.Decode as JsonDec exposing((:=), Decoder)
 import Json.Decode.Extra exposing ((|:))
@@ -35,8 +36,9 @@ type alias Page = String
 type alias Model =
   { loginModel    : Login.Model
   , roomModel     : Room.Model
-  , currentPage  : Page
+  , currentPage   : Page
   , authenticated : Bool
+  , playerModel   : Player.Model
   }
 
 initialModel : Model
@@ -45,6 +47,7 @@ initialModel =
   , roomModel     = Room.init
   , currentPage   = "LoginPage"
   , authenticated = False
+  , playerModel   = Player.init
   }
 
 init : Maybe String -> (Model, Cmd Msg)
@@ -123,10 +126,11 @@ serialize model =
 serializer : Model -> JsonEnc.Value
 serializer model =
   JsonEnc.object 
-    [ ("login",         Login.serializer model.loginModel)
-    , ("room",          Room.serializer  model.roomModel)
-    , ("authenticated", JsonEnc.bool     model.authenticated)
-    , ("currentPage",   JsonEnc.string   model.currentPage)
+    [ ("login",         Login.serializer  model.loginModel)
+    , ("room",          Room.serializer   model.roomModel)
+    , ("authenticated", JsonEnc.bool      model.authenticated)
+    , ("currentPage",   JsonEnc.string    model.currentPage)
+    , ("player",        Player.serializer model.playerModel)
     ]
 
 
@@ -144,6 +148,7 @@ deserializer =
     |: ("room"          := Room.deserializer)
     |: ("currentPage"   := JsonDec.string)
     |: ("authenticated" := JsonDec.bool)
+    |: ("player"        := Player.deserializer)
 
 
 port setStorage : String -> Cmd msg
