@@ -18,6 +18,7 @@ type alias MonsterBase =
   { name      : String
   , hitPoints : Int
   , image     : String
+  , xp        : Int
   }
 
 type alias Model =
@@ -37,6 +38,7 @@ orc =
   { name      = "Orc"
   , hitPoints = 20
   , image     = "images/orc.png"
+  , xp        = 20
   }
 
 goblin : MonsterBase
@@ -44,6 +46,7 @@ goblin =
   { name      = "Goblin"
   , hitPoints = 10
   , image     = "images/troll-155646_640.png"
+  , xp        = 10
   }
 
 sheep : MonsterBase
@@ -51,6 +54,7 @@ sheep =
   { name      = "Sheep Warrior"
   , hitPoints = 8
   , image     = "images/sheep-158272_640.png"
+  , xp        = 10
   }
 
 monsters : List MonsterBase
