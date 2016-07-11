@@ -102,7 +102,7 @@ monsterAttacked model =
     if hp > 0 then
       model' ! []
     else
-      model' ! [Random.generate NewMonster (Random.int 0 (List.length monsters))] -- [Helper.message <| NewMonster 0]
+      model' ! [Random.generate NewMonster (Random.int 0 (List.length monsters))]
 
 newMonster : Int -> Model -> (Model, Cmd Msg)
 newMonster val model =
